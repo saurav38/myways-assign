@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>User Registration Form</title>
+</head>
+<body>
+  <h1>User Registration Form</h1>
+  <form id="userForm" action="">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required><br>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required><br>
+
+    <label for="phone">Phone:</label>
+    <input type="tel" id="phone" name="phone" required><br>
+
+    <button type="submit" id="submitBtn">Submit</button>
+  </form>
+
+  <script>
+    const form = document.querySelector('#userForm');
+    const submitBtn = document.querySelector('#submitBtn');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const name = form.elements.name.value;
+      const email = form.elements.email.value;
+      const phone = form.elements.phone.value;
+
+      // Make a GET request to check if the user already exists
+      const getUserResponse = await fetch(`https://test-api-v3.myways.ai/user?email=${email}`);
+
+      if (getUserResponse.ok) {
+        const user = await getUserResponse.json();
+
+        if (user) {
+          alert('User Found');
+        } else {
+          // If user does not exist, make a POST request to create the user
+          const createUserResponse = await fetch('https://test-api-v3.myways.ai/user', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name, email, phone })
+          });
+
+          if (createUserResponse.ok) {
+            alert('User Created Successfully');
+          } else {
+            alert('Failed to create user');
+          }
+        }
+      } else {
+        alert('Failed to fetch user');
+      }
+    });
+  </script>
+</body>
+</html>
